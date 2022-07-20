@@ -9,7 +9,7 @@ int Field[FieldHeight][FieldWidth]={0};
 int dx=0;
 bool pn=true;
 bool checklines=false;
-RenderWindow window(VideoMode(320,640),"Tetris", Style::Titlebar | Style::Close);
+RenderWindow window(VideoMode(480,640),"Tetris", Style::Titlebar | Style::Close);
 int Tetriminos[7][4] =
 {
     1,3,5,7, ///I
@@ -46,17 +46,32 @@ bool check()
 }
 int main(void)
 {
+    
     window.setFramerateLimit(30);
     srand(time(0));
     int nCurrentPiece=rand()%7;
     bool rotate=false;
-    Texture tex;
-    tex.loadFromFile("Assets/Blue.png");
+    int col=rand()%6;
+    Texture tex[7];
+    tex[0].loadFromFile("Assets/Blue.png");
+    tex[1].loadFromFile("Assets/Green.png");
+    tex[2].loadFromFile("Assets/LightBlue.png");
+    tex[3].loadFromFile("Assets/Orange.png");
+    tex[4].loadFromFile("Assets/Purple.png");
+    tex[5].loadFromFile("Assets/Red.png");
+    tex[6].loadFromFile("Assets/Yellow.png");
     Sprite SPiece;
-    SPiece.setTexture(tex);
+    SPiece.setTexture(tex[col]);
     SPiece.setScale(Vector2f(0.5,0.5));
+    int Score=0;
+    Font pixel;
+    pixel.loadFromFile("Assets/pixel.ttf");
+    Text TScore;
+    TScore.setFont(pixel);
     while (window.isOpen())
     {
+        int col=rand()%5;
+        TScore.setString("Score: "+to_string(Score));
         float delay=0.8;
         float time=clocker.getElapsedTime().asSeconds();
         clocker.restart();
@@ -150,7 +165,7 @@ if (timer>delay)
         for (int i=0; i<4; ++i)
         {
             CPiece[i]=BPiece[i];
-            Field[BPiece[i].y][BPiece[i].x]=1;
+            Field[BPiece[i].y][BPiece[i].x]=(col+1);
             nCurrentPiece=rand()%7;
         }
         pn=true;
@@ -164,26 +179,25 @@ if (timer>delay)
 if (checklines)
 {
     
-    for (int i=0; i<4;++i)
+    for (int py=0;py<FieldHeight;py++)
     {
-        int count=0;
-        int yp=CPiece[i].y;
-        for (int px=0; px<FieldWidth;++px)
+        int count =0;
+        for (int px=0; px<FieldWidth;px++)
         {
-            if (Field[yp][px]) {
+            if (Field[py][px]!=0) 
+            {
                 ++count;
             }
         }
         if (count==FieldWidth)
         {
-            cout<<"a line"<<endl;
-            for (int i=0; i<FieldWidth;++i)
+            Score+=100;
+            for (int i=0; i<FieldWidth; i++)
             {
-                Field[yp-1][i]=Field[yp][i];
-                Field[yp][i]=0;
+                Field[py][i]=Field[py-1][i];
+                Field[py-1][i]=Field[py-2][i];
             }
         }
-
     }
 
 
@@ -202,13 +216,19 @@ if (checklines)
         {
             if (Field[py][px]==0) continue;
             Sprite field;
-            field.setTexture(tex);
+            field.setTexture(tex[Field[py][px]]);
+             SPiece.setTexture(tex[Field[py][px]]);
             field.setPosition(Vector2f(px*32,py*32));
+
             field.setScale(Vector2f(0.5,0.5));
             window.draw(field);
+            TScore.setPosition(Vector2f(320,0));
+            window.draw(TScore);
         }
     }
+    
     window.display();
     }
+    cout <<"game over"<<endl;
 
 }
