@@ -1,6 +1,6 @@
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <time.h>
-#include <iostream>
 using namespace sf;
 using namespace std;
 const int FieldHeight=20;
@@ -68,8 +68,29 @@ int main(void)
     pixel.loadFromFile("Assets/pixel.ttf");
     Text TScore;
     TScore.setFont(pixel);
+    SoundBuffer buffer;
+    buffer.loadFromFile("Assets/fall.wav");
+    SoundBuffer cl;
+    SoundBuffer ro;
+    ro.loadFromFile("Assets/rotate.wav");
+    Sound rot;
+    rot.setBuffer(ro);
+    rot.setVolume(45);
+    cl.loadFromFile("Assets/line.wav");
+    Sound fall;
+    Sound clear;
+    clear.setBuffer(cl);
+    clear.setVolume(70);
+    fall.setBuffer(buffer);
+    fall.setVolume(29);
+    Music theme;
+    theme.openFromFile("Assets/tetris.ogg");
+    theme.play();
+    theme.setVolume(35);
+    theme.setLoop(true);
     while (window.isOpen())
     {
+
         int col=rand()%5;
         TScore.setString("Score: "+to_string(Score));
         float delay=0.8;
@@ -95,6 +116,7 @@ int main(void)
                         break;
                     case Keyboard::Up:
                         rotate=true;
+                        rot.play();
                         break;
                     case Keyboard::Down:
                     delay=0.01;
@@ -131,6 +153,7 @@ if (!check()) {
 
 dx=0;
 }
+
 //////////////////////////////////////////////////////////////////////////////////////
 //=============ROTATE=================================================
 if (rotate && nCurrentPiece !=4)
@@ -159,9 +182,9 @@ if (timer>delay)
     {
         BPiece[i]=CPiece[i];
         CPiece[i].y+=1;
-        //cout <<CPiece[i].y<<endl;
     }
     if (!check()) {
+        fall.play();
         for (int i=0; i<4; ++i)
         {
             CPiece[i]=BPiece[i];
@@ -172,7 +195,7 @@ if (timer>delay)
         checklines=true;
     }
 
-
+        
     timer=0;
 }
 ///////////////////check for lines////////////////////
@@ -191,19 +214,26 @@ if (checklines)
         }
         if (count==FieldWidth)
         {
+            clear.play();
             Score+=100;
+            delay-=2*(Score/1000);
             for (int i=0; i<FieldWidth; i++)
             {
                 Field[py][i]=Field[py-1][i];
                 Field[py-1][i]=Field[py-2][i];
+                Field[py-2][i]=Field[py-3][i];
+                Field[py-3][i]=Field[py-4][i];
+                Field[py-4][i]=Field[py-5][i];
+                Field[py-5][i]=Field[py-6][i];
+                Field[py-6][i]=Field[py-7][i];
+                Field[py-7][i]=Field[py-8][i];
+                Field[py-8][i]=Field[py-9][i];
             }
         }
     }
 
 
 }
-
-
         window.clear(Color(80,80,80,1));
     for (int i=0; i<4; ++i)
     {
@@ -229,6 +259,5 @@ if (checklines)
     
     window.display();
     }
-    cout <<"game over"<<endl;
 
 }
