@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>EmailBot</class>
+ <widget class="QMainWindow" name="EmailBot">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1045</width>
+    <height>744</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>EmailBot</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>60</y>
+      <width>521</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label1_2">
+       <property name="styleSheet">
+        <string notr="true">Username {
+font: bold;
+}</string>
+       </property>
+       <property name="text">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Password   &lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="Password">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>10</y>
+      <width>101</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;b&gt;Department&lt;/b&gt;</string>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="dept">
+    <property name="geometry">
+     <rect>
+      <x>600</x>
+      <y>40</y>
+      <width>181</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Electrical Engineering</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Software Engineering</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Mechanical Engineering</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Biomedical Engineering</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QGroupBox" name="groupBox">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>100</y>
+      <width>811</width>
+      <height>591</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>10</pointsize>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="title">
+     <string>Email</string>
+    </property>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>40</y>
+       <width>531</width>
+       <height>351</height>
+      </rect>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label1_3">
+          <property name="styleSheet">
+           <string notr="true">Username {
+font: bold;
+}</string>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Recipient&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="Recipient">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <bold>false</bold>
+           </font>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="label1_5">
+          <property name="styleSheet">
+           <string notr="true">Username {
+font: bold;
+}</string>
+          </property>
+          <property name="text">
+           <string>&lt;b&gt;Subject&lt;/b&gt;  
+ </string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="Subject"/>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>&lt;b&gt;   Text&lt;/b&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTextEdit" name="Text"/>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QPushButton" name="send">
+     <property name="geometry">
+      <rect>
+       <x>590</x>
+       <y>160</y>
+       <width>83</width>
+       <height>29</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Send</string>
+     </property>
+    </widget>
+    <widget class="QWidget" name="layoutWidget">
+     <property name="geometry">
+      <rect>
+       <x>20</x>
+       <y>400</y>
+       <width>601</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QListWidget" name="attchments"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
+         <string>File</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>20</y>
+      <width>521</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label1">
+       <property name="styleSheet">
+        <string notr="true">Username {
+font: bold;
+}</string>
+       </property>
+       <property name="text">
+        <string>&lt;b&gt;Username&lt;/b&gt;   </string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="username"/>
+     </item>
+    </layout>
+   </widget>
+   <widget class="Line" name="line">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>90</y>
+      <width>711</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1045</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
