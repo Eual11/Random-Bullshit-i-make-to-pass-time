@@ -2,36 +2,45 @@
 #include <array>
 #include <vector>
 #include <time.h>
+#include <algorithm>
 #include <string>
 #include <fstream>
+#include <ctime>
 #include <sstream>
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #define start 0x200
 using namespace std;
 using namespace sf;
 uint16_t fetch(uint16_t &PC);
-array <char, 4*1024> ram; //the program memory
+array <unsigned char, 4*1024> ram; //the program memory
 uint8_t V[16];//15 general purpose registers and VF flag
 uint16_t PC=0x0000;//16 bit program counter
-uint16_t I=0x0000; //16 bit index register
+uint16_t I=0x200; //16 bit index register
 vector <uint16_t> stack; //stack for 16bit addresses which is used for call backs
 uint8_t nDelayTimer=0x00;
 uint8_t nSoundTimer=0x00;
-RenderWindow window(VideoMode(480,320), "chip 8");
-
+void memory_dump(std::array<unsigned char, 4096> &ram);
+void screen_dump(std::array <uint8_t,2048> &screen);
+RenderWindow window(VideoMode(1280,600), "chip 8",sf::Style::Close|sf::Style::Titlebar);
+string to_hex(int decimal);
 int main (void)
 {
-     char number;
+     Music music;
+     music.openFromFile("music.ogg");
+     music.play();
+     window.setFramerateLimit(15);
+     unsigned char number;
      //setting the ram to zero
-     for (auto &val: V) val=0x00; //setting all of the registers to zero
+     ram.fill(0x00); //setting all of the registers to zero
 //======================writes the content of rom to ram starting at address 0x200==============//
      ifstream rom;
-     rom.open("rom.ch8", ios::binary|ios::ate);
+     rom.open("eu.ch8", ios::binary|ios::ate);
 /**
  * 
  * another possible way to load the rom
      std::streampos size=rom.tellg();
-     char *buffer = new char [size];
+     unsigned char *buffer = new unsigned char [size];
      rom.seekg(0,ios::beg);
      rom.read(buffer,size);
      for (int i=0; i <size;++i)
@@ -52,10 +61,10 @@ int main (void)
      rom.close();
      //delete[] buffer;
 //=======================FONTS========================================
-     const unsigned int FONTSET_SIZE = 80;
-     uint8_t fontset[FONTSET_SIZE] =
+
+     uint8_t fontset[80] =
 {
-	0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
+	0xAA, 0xAA, 0xAA, 0x90, 0xF0, // 0
 	0x20, 0x60, 0x20, 0x20, 0x70, // 1
 	0xF0, 0x10, 0xF0, 0x80, 0xF0, // 2
 	0xF0, 0x10, 0xF0, 0x10, 0xF0, // 3
@@ -72,46 +81,82 @@ int main (void)
 	0xF0, 0x80, 0xF0, 0x80, 0xF0, // E
 	0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
-
-for (int i=0; i<80; ++i)
+stack.push_back(0);
+for (int i=0; i < 80; i++ )
 {
      ram[i]=fontset[i];
 }
+
 //=======================================================================================
 
 //=========================the screen=================================================////
-array <uint8_t,2048> screen={0};
+array <uint8_t,2048> screen;
+screen.fill(0);
 
 ///======================================================
-
+ Font font;
+      if (!font.loadFromFile("font/font.ttf"))
+      {
+          cout <<"couldn't load font"<<endl;
+      }
      
 //=====================================================================================================
   PC=0x0000;
-  cout<<"========"<<endl;
+  bool exectute=false;
+  uint16_t opcode=0x0000;
+  bool step=false;
+      for (int i=0; i< 44; i++)
+    {
+        screen[30+i]=0;
+    }
   while (window.isOpen())
   {
      //===================Fetching opcode=================================///
-     uint16_t opcode=fetch(PC);
-
+     
+     if (step | true)
+     {
+          opcode=fetch(PC);
+          step=false;
+     }
 
      uint8_t nFirstNibble=(opcode & 0xF000)>>12; //exteracts first nibble
-     uint8_t nLastNibble =(opcode &0x000F);  //exteracts the last nibble
+     uint8_t nLastNibble =(opcode & 0x000F);  //exteracts the last nibble
      uint8_t nSecondNibble =(opcode & 0x0F00)>>8; //exteracts the second nibble
      uint8_t nThirdNibble =(opcode & 0x00F0)>>4; //exteracts the third nibble
      uint8_t nNN = (nThirdNibble<<4 | nLastNibble); //exteracts the second byte
      uint16_t nNNN=(opcode &0XFFF);//12 bit address
      //================================================================================
 
+          Text tOpcode;
+          tOpcode.setFont(font);
+          tOpcode.setScale(Vector2f(0.5,0.5));
+          tOpcode.setString("opcode: "+to_hex(opcode));
+          tOpcode.setPosition(Vector2f(1000,90));
+          window.draw(tOpcode);
+
+          Text tStack;
+          
+          
+               tStack.setFont(font);
+               tStack.setScale(Vector2f(0.5,0.5));
+               tStack.setString("Stack: "+to_hex(stack.back()));
+
+               tStack.setPosition((Vector2f(30+(15),40)));
+
+               window.draw(tStack);
+          
+
 
      //===============================Decoding the instructions======================================
-
+     if (exectute | true)
+     {
+          exectute=false;
      switch (nFirstNibble)
      {
           case 0:
           if (opcode==0x00E0)
           {
                screen.fill(0);
-               //cout<<"cleared"<<endl;
           }
           else if (opcode == 0x0EE)
           {
@@ -145,7 +190,7 @@ array <uint8_t,2048> screen={0};
           //skips one instruction if VX!=nNN
                if (V[nSecondNibble]!=nNN)
                {
-                    PC+=2;
+                    PC;
                }
                break;
 
@@ -153,7 +198,7 @@ array <uint8_t,2048> screen={0};
           //skips if VX==VY
                if (V[nSecondNibble]==V[nThirdNibble])
                {
-                    PC+=2;
+                    PC;
                }
           break;
 
@@ -232,14 +277,14 @@ array <uint8_t,2048> screen={0};
                          V[nSecondNibble]=V[nThirdNibble]-V[nSecondNibble];
                          break;
                case 6:
-                     //shifts VX to right one bit
-                     V[0xF]= 1 & V[nSecondNibble];
+                     //shifts VX to right one bitt
+                     V[0xF]= 1 & V[nSecondNibble]? 1:0 ;
                      V[nSecondNibble] = V[nSecondNibble]>>1;
                      break;
 
                case 14:
-                   V[0xF]= 0x80 & V[nSecondNibble];
-                   V[nSecondNibble] = V[nSecondNibble]<<1;
+                   V[0xF]= 0x80 & V[nSecondNibble]? 1:0;
+                   V[nSecondNibble] = (V[nSecondNibble]<<1);
                    break;
                     
 
@@ -258,7 +303,7 @@ array <uint8_t,2048> screen={0};
 
           case 10:
           //sets the index register to NNN
-               I=nNNN;
+          I=nNNN;
           break;
 
           case 11:
@@ -269,34 +314,37 @@ array <uint8_t,2048> screen={0};
           case 12:
           {
                //generates a random binary number and it with vx
-               uint8_t e= rand();
-               uint8_t nLastByte= opcode &0x00FF;
+               srand(time(0));
+               uint8_t e= rand() %nNN;
+               e+=1;
 
-               V[0]=e & nLastByte;
+               V[0]=e;
                break;
           }
 
           case 13:
           {
-               uint8_t nPosX=V[nSecondNibble]%64;
-               uint8_t nPosY=V[nThirdNibble]%32;
-               int row=nLastNibble;
+              uint8_t xPos = V[nSecondNibble] % 64;
+              uint8_t yPos = V[nThirdNibble] % 32;
+              uint8_t row = nLastNibble;
+              //cout <<to_hex(nLastNibble)<<endl;
 
-               for (int i=0; i <row; ++i)
+              for (int i=0; i < nLastNibble; i++)
+              {
+               uint8_t Byte = ram[I+i];
+
+               for (int j=0; j < 8; ++j)
                {
-                    uint8_t Byte=ram[I+i];
-                    cout<<"\r i just want to sleep forever ";
+                    //it is j
+                    int ri = 7-j;
+                    uint8_t bit = (1 << ri) & Byte;
+                    bit = bit >> ri;
 
-                    for (int j=0; j<8;++j)
-                    {
-                         //row+poxy
-                         uint8_t screenbit=screen[8*(row+nPosY)+(nPosX+j)];
-                         screen[8*(row+nPosY)+(nPosX+j)]=screen[8*(row+nPosY)+(nPosX+j)] | 1;
-                         V[0xF]=screenbit & ((Byte & (128>>j))>>(7-j));
-                    
-                         
-                    }
+                    screen[(xPos+(64*yPos)+j)+64*i] = bit; 
+
                }
+
+              }
 
           break;
           
@@ -304,7 +352,8 @@ array <uint8_t,2048> screen={0};
 
           case 14:
           //
-          {cout<<'s';
+          {
+               
           break;}
 
           case 15:
@@ -368,6 +417,7 @@ array <uint8_t,2048> screen={0};
                {
                     I=V[nSecondNibble];
                }
+               
                case 3:
                {
                     int num=V[nSecondNibble];
@@ -393,31 +443,109 @@ array <uint8_t,2048> screen={0};
           }
           
      }
-
+     }
+ 
+    screen_dump(screen);
+    memory_dump(ram);
       Event event;
+     
+      array <Text,16> Registers;
+      
+          Text tRam;
+          tRam.setFont(font);
+          tRam.setScale(Vector2f(0.5,0.5));
+          string tu= "RAM[I] = ";
+          tu+=to_hex(ram[I]);
+          tRam.setString(tu);
+          tRam.setPosition(Vector2f(1000,115));
+          window.draw(tRam);
+
+      for (int i=0; i <16; i++)
+      {
+          Registers[i].setFont(font);
+          Registers[i].setScale(Vector2f(0.5,0.5));
+          Registers[i].setPosition(Vector2f(850,50+(i*16)));
+          string text= "V ["+to_string(i)+"] = "+to_hex(V[i]);
+          Registers[i].setString(text);
+          window.draw(Registers[i]);
+
+      }
+      Text ProgramCounter;
+      ProgramCounter.setFont(font);
+      ProgramCounter.setScale(Vector2f(0.5,0.5));
+      string pText = "PC: "+ to_hex(PC);
+      ProgramCounter.setString(pText);
+      ProgramCounter.setPosition(Vector2f(1000,50));
+      window.draw(ProgramCounter);
+      
+      Text Index;
+      Index.setFont(font);
+      Index.setScale(Vector2f(0.5,0.5));
+     string iText = "I: " + to_hex(I);
+     Index.setString(iText);
+     Index.setPosition(Vector2f(1000,66));
+     window.draw(Index);
+
+
+
+      
+
   while(window.pollEvent(event))
   {
-     if (event.type==Event::Closed)
+     switch (event.type)
      {
-          window.close();
+          case Event::Closed:
+          {
+               window.close();
+               break;
+          }
+
+          case Event::KeyPressed:
+          {
+               if (event.key.code ==Keyboard::Right )
+               {
+                    step=true;
+               }
+               if (event.key.code == Keyboard::E)
+               {
+                    PC=0;
+               }
+               if (event.key.code == Keyboard::Down)
+               {
+                    exectute=true;
+               }
+          }
+
      }
   }
 
+////////////////===============the battle begins here===========//////////////////////////
 
-for (int i=0; i<screen.size(); i++)
-{
-     if (screen[i])
+     for (int i =0 ; i <screen.size(); ++i)
      {
-          int x=i%64;
-          int y=i/32;
-          RectangleShape pixel(Vector2f(6,6));
+          int xPos = i % 64;
 
-          pixel.setFillColor(Color::White);
-          pixel.setPosition(Vector2f(x*6,y*6));
-          window.draw(pixel);
+          int yPos = i/64;
+
+          RectangleShape pixel;
+          pixel.setSize(Vector2f(5,5));
+          pixel.setPosition(Vector2f(xPos*5+200,yPos*5+200));
+          pixel.setFillColor(Color::Green);
+
+         
+
+          if (screen[i])
+          {
+               pixel.setFillColor(Color::White);
+          }
+
+           window.draw(pixel);
+
+
 
      }
-}
+
+//////////////////////////////===============================//////////////////////////////////////////
 
 
   window.display();
@@ -441,6 +569,61 @@ uint16_t fetch(uint16_t &PC)
           PC+=2;
      }
      return opcode;
+}
+
+void memory_dump(std::array <unsigned char,4096> &ram)
+{
+    fstream out;
+    out.open("ram.txt", ios::out|ios::trunc);
+
+    for (auto &d: ram)
+    {
+        out<<d;
+    }
+
+}
+
+void screen_dump(std::array <uint8_t,2048> &screen)
+{
+      fstream out;
+    out.open("screen.txt", ios::out|ios::trunc);
+
+    for (auto &d: screen)
+    {
+        out<<d;
+    }
+}
+
+string to_hex(int decimal)
+{
+     string hex_dec= "";
+     if (decimal==0)
+     {
+          return "0";
+     }
+     while (decimal > 0)
+     {
+          unsigned char ch;
+
+          int reminder = decimal % 16;
+
+          if (reminder >= 10)
+          {
+               ch = reminder + 55;          
+          }
+
+          else 
+          {
+               ch = reminder +48;
+          }
+          
+          hex_dec+=ch;
+          decimal/=16;
+          
+     }
+     reverse(hex_dec.begin(),hex_dec.end());
+
+     return hex_dec;
 }
 //========================================================================================================================
 
