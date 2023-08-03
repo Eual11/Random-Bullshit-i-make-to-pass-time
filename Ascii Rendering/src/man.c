@@ -33,18 +33,18 @@ int main(int argc, char **argv)
                 // printf("inflooped\n");
             }
             // printf("out\n");
-
+            char pnt = ",-~:;=!*#$@"[iter%12];
             if (iter == MAX_ITER)
             {
-                mvaddch(y, x, '*');
+                mvaddch(y, x, pnt);
             }
             else if (iter > 600)
             {
-                mvaddch(y, x, '*');
+                mvaddch(y, x, pnt);
             }
             else if (iter > 400)
             {
-                mvaddch(y, x, '#');
+                mvaddch(y, x, pnt);
             }
             else
             {

@@ -2,6 +2,7 @@
 #include <string.h>
 #include <locale.h>
 #include <wchar.h>
+#include <time.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -68,3 +69,4 @@ WinState* ascii_render(WinState* cur_state, char* ascii_buffer);
 
 void COMPOSE(WINDOW* msg_win, WINDOW* credits_win, WINDOW* ascii_win, char* filename);
 void fractal_generate(WINDOW* win, unsigned int size);
+int make_worms(WINDOW *g_win);
